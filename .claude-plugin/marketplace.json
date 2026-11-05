@@ -1,0 +1,23 @@
+{
+  "name": "qgis-agent",
+  "owner": {
+    "name": "Abdelaali Mouid",
+    "url": "https://github.com/abdelaalimouid"
+  },
+  "metadata": {
+    "description": "Claude Code skill for working in QGIS and remote sensing"
+  },
+  "plugins": [
+    {
+      "name": "qgis-agent",
+      "source": "./",
+      "description": "A working method and tools for driving QGIS with Claude Code: approved plan, numbered PyQGIS scripts, result checks, factual work report.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Abdelaali Mouid"
+      },
+      "homepage": "https://github.com/abdelaalimouid/qgis-agent",
+      "category": "productivity"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "qgis-agent",
+  "description": "A working method and tools for driving QGIS with Claude Code: approved plan, numbered PyQGIS scripts, result checks and a factual work report. Sentinel-2, spectral indices, classification, class areas, maps.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Abdelaali Mouid",
+    "url": "https://github.com/abdelaalimouid"
+  },
+  "homepage": "https://github.com/abdelaalimouid/qgis-agent",
+  "repository": "https://github.com/abdelaalimouid/qgis-agent",
+  "license": "MIT",
+  "keywords": ["qgis", "pyqgis", "gis", "remote-sensing", "sentinel-2", "ndvi", "earth-observation"]
+}
