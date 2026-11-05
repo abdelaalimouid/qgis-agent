@@ -62,6 +62,19 @@ After that, just ask for what you want to do. You don't need to name the skill: 
 
 By default it uses open data with no account: Sentinel-2 from the Earth Search catalogue, OpenStreetMap through the Overpass API.
 
+### Network access
+
+The data scripts need these hosts. If you run Claude Code in a sandbox or behind a firewall, allow them:
+
+| Host | Used for |
+|---|---|
+| `earth-search.aws.element84.com` | Sentinel-2 catalogue |
+| `e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com` | Sentinel-2 image files |
+| `sentinel-cogs.s3.us-west-2.amazonaws.com` | Mirror of the image files, used with `--collection sentinel-2-l2a` |
+| `overpass-api.de` | OpenStreetMap data |
+
+If the image files can't be reached, the scripts stop with a clear message and point to the mirror. Both sources give identical reflectance.
+
 ## Contents
 
 Everything is in [`skills/qgis-agent/`](skills/qgis-agent):
@@ -84,6 +97,7 @@ Everything is in [`skills/qgis-agent/`](skills/qgis-agent):
 - A fresh agent, told nothing about the skill, received a student's request: NDVI around Azrou, five classes, class areas, a map and a QGIS project. It opened the skill by itself, proposed a plan, waited for approval, then produced everything in four minutes. An independent recalculation gives an identical NDVI, class areas within 0.02 %, and a project that reopens with no warnings.
 - A second fresh agent, given a request written in French (NDBI and MNDWI on Khénifra), opened the skill by itself, answered in French and planned with the imagery rules: bundled download, reflectance, 20 m for the SWIR indices, full coverage of the area.
 - The Sentinel-2 bands downloaded by the skill match those of a reference project (Ifrane forest) pixel for pixel.
+- With the image host blocked, the scripts stop with a clear message, and the mirror collection gives the same reflectance as the default one (difference below 0.0000001). An earlier test agent that worked around a blocked host with its own code subtracted the offset twice; version 1.0.1 makes the scripts and the rules close that gap.
 - Windows has not been tested yet. Feedback is welcome in the [Issues](https://github.com/abdelaalimouid/qgis-agent/issues).
 
 ## Guide
@@ -94,7 +108,7 @@ The guide [Working with an AI agent in QGIS](docs/qgis-agent-guide.pdf) (10 page
 
 If this skill helps with a report or a paper, please cite it ("Cite this repository" button on the right):
 
-> Mouid, A. (2026). *qgis-agent: a Claude Code skill for working in QGIS* (version 1.0.0) [software]. https://github.com/abdelaalimouid/qgis-agent
+> Mouid, A. (2026). *qgis-agent: a Claude Code skill for working in QGIS* (version 1.0.1) [software]. https://github.com/abdelaalimouid/qgis-agent
 
 ## Author
 

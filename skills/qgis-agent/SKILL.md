@@ -60,6 +60,7 @@ If the user asks "how do I do it?", offer both routes: you run the chain with th
 - For imagery, read only the area you need (windowed reads of COG files) and run long downloads in the background while you write the next step.
 - Save the `.qgz` project with relative paths, layer styles and print layouts. Also export each style as a `.qml` in `styles/` so it can be reused.
 - Keep a short `journal.md`: each user request, the decisions taken and why. It is the record of the method, useful when the user writes up.
+- If a bundled script fails, read its message: it says what to do. Fix the cause or tell the user. Do not swap in home-made code or another data source without checking its values against the reference ranges below; a quiet workaround can produce wrong results that look fine.
 
 Satellite imagery rules, to apply in every plan (details in `references/remote_sensing.md`):
 
@@ -67,6 +68,8 @@ Satellite imagery rules, to apply in every plan (details in `references/remote_s
 - Use reflectance, not raw values: apply the scale and offset from the band metadata (usually value × 0.0001 − 0.1).
 - Indices that use B11 or B12 (NDMI, NBR, MNDWI, NDBI) are computed at 20 m: average the 10 m bands down to 20 m. Never resample the 20 m bands up to 10 m, which creates detail that is not in the data. Pixel area at 20 m: 0.04 ha.
 - Take all tiles from the same pass (same date), and pick a date whose tiles cover the whole area.
+- If the image files cannot be reached (network, firewall or sandbox), the scripts say so: rerun both with `--collection sentinel-2-l2a`, a mirror stored on another host. Never read that mirror with your own code: its values already include the −0.1 offset while its metadata still declares it, so subtracting it again makes every band 0.1 too low and skews every index. The scripts handle this.
+- Sanity check before computing indices: over land, median visible reflectance (B02, B03, B04) is rarely below 0.03, and summer bare soil or towns sit around 0.08 to 0.15. Much lower values point to a double offset.
 
 Read `references/pyqgis.md` before writing PyQGIS code: tested recipes (raster calculator, discrete symbology, reclassification, zonal histogram, print layout, legend, scale bar, interface screenshots) and known pitfalls. Read `references/remote_sensing.md` as soon as satellite imagery is involved: bands, reflectance, clouds, index formulas, open data sources, licences.
 

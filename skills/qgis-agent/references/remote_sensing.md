@@ -20,6 +20,15 @@ Resolution: an index that uses B11 or B12 is computed at 20 m. Bring 10 m bands 
 
 Mosaics: take all tiles from one pass (same day, same satellite). Mixing two dates creates seams and skews comparisons.
 
+### Two Sentinel-2 collections on Earth Search
+
+| Collection | Image host | Reflectance |
+|---|---|---|
+| `sentinel-2-c1-l2a` (default) | `e84-earth-search-sentinel-data.s3.us-west-2.amazonaws.com` | value × 0.0001 − 0.1 (offset from `raster:bands`) |
+| `sentinel-2-l2a` (mirror) | `sentinel-cogs.s3.us-west-2.amazonaws.com` | value × 0.0001, no offset: the item property `earthsearch:boa_offset_applied` is `true` |
+
+The same pixel differs by exactly 1,000 between the two collections, and the mirror's metadata still declares an offset of −0.1. Applying it makes every band 0.1 too low: in a test on Khénifra, the NDBI class above 0.2 grew from 0.2 % to 6 % of the area. `scripts/s2_download.py` reads the property and applies the right rule. Item ids also differ (`S2B_T30STB_20260726T110336_L2A` against `S2B_30STB_20260726_0_L2A`), so search and download with the same `--collection`.
+
 ### Clouds and snow: the SCL layer
 
 | Code | Meaning | Code | Meaning |
