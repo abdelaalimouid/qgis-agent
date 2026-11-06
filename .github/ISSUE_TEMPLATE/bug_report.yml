@@ -1,0 +1,45 @@
+name: Something went wrong
+description: An error, a crash, or a result that turned out to be wrong
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting. A wrong result that looked fine is the most useful report there is.
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows, macOS, Linux]
+    validations:
+      required: true
+  - type: input
+    id: qgis
+    attributes:
+      label: QGIS version and how it is installed
+      placeholder: "3.44, QGIS installer / conda-forge / OSGeo4W / Linux packages"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How you installed the skill
+      options: [Plugin (/plugin install), Zip in ~/.claude/skills, Other]
+  - type: textarea
+    id: request
+    attributes:
+      label: What you asked Claude
+      description: Your request, as typed.
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error message or output
+      description: Paste the exact message. It will be shown as code.
+      render: text

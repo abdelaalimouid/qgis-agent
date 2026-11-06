@@ -1,0 +1,24 @@
+name: Idea or new skill
+description: A task the skill should handle, an example to add, or an improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: The task
+      description: What would you like an agent to do in QGIS? A real example helps most.
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: How would we know the result is right?
+      description: A known value, a reference dataset, a hand calculation, a field check...
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Can you help?
+      options:
+        - label: I can test it on my machine
+        - label: I can share data or a reference result
+        - label: I can write part of it
