@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>qgis-agent</title>
+<meta name="description" content="A free, open-source Claude Code skill for QGIS and remote sensing. It plans first, uses QGIS's own tools, and checks every result before handing it over.">
+<meta property="og:title" content="qgis-agent">
+<meta property="og:description" content="An AI agent for QGIS that checks its own maps. Free and open source.">
+<meta property="og:image" content="https://abdelaalimouid.github.io/qgis-agent/img/social-preview.png">
+<meta property="og:url" content="https://abdelaalimouid.github.io/qgis-agent/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cedar: #16302B; --cedar-2: #1d3d37; --ink: #1d2a26; --muted: #5d6b66; --soft: #b9d3c8;
+    --ochre: #9a6220; --ochre-light: #e7c27d; --pale: #eef3f0; --line: #cfd9d4; --paper: #ffffff;
+    --wrong: #b4442f;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Source Serif 4', Georgia, serif;
+         font-size: 18px; line-height: 1.55; }
+  h1, h2, h3, nav, .btn, .label, figcaption, .num, th, .stat, .fig { font-family: 'IBM Plex Sans Condensed', 'Arial Narrow', sans-serif; }
+  a { color: inherit; }
+  a:focus-visible, .btn:focus-visible { outline: 3px solid var(--ochre-light); outline-offset: 3px; }
+  code, pre { font-family: 'IBM Plex Mono', Menlo, monospace; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+  /* header */
+  header { position: absolute; top: 0; left: 0; right: 0; z-index: 2; }
+  header .wrap { display: flex; justify-content: space-between; align-items: center; height: 72px; }
+  .brand { font-family: 'IBM Plex Sans Condensed', sans-serif; font-weight: 700; font-size: 22px; color: #fff; text-decoration: none; }
+  nav { display: flex; gap: 26px; font-size: 17px; }
+  nav a { color: var(--soft); text-decoration: none; }
+  nav a:hover { color: #fff; }
+
+  /* hero */
+  .hero { background: var(--cedar); color: #fff; position: relative; overflow: hidden; padding: 128px 0 84px; }
+  .hero .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .32; }
+  .hero .wrap { position: relative; display: grid; grid-template-columns: 1fr 1.05fr; gap: 56px; align-items: center; }
+  .hero h1 { font-size: 58px; line-height: 1.02; font-weight: 600; letter-spacing: -0.5px; margin: 0 0 22px; }
+  .hero p { color: #d3e3dc; font-size: 20px; margin: 0 0 30px; max-width: 34em; }
+  .btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn { display: inline-block; text-decoration: none; font-size: 18px; font-weight: 600; padding: 12px 22px; border: 2px solid var(--ochre-light); }
+  .btn.primary { background: var(--ochre-light); color: var(--cedar); }
+  .btn.ghost { color: #fff; }
+  .demo { width: 100%; display: block; border: 1px solid #2f524a; box-shadow: 0 18px 40px rgba(0,0,0,.35); }
+  .spectrum { display: flex; height: 6px; } .spectrum span { flex: 1; }
+
+  section { padding: 88px 0; }
+  .pale { background: var(--pale); }
+  h2 { font-size: 40px; line-height: 1.08; font-weight: 600; color: var(--cedar); margin: 0 0 14px; letter-spacing: -0.3px; }
+  .lead { font-size: 20px; color: var(--muted); max-width: 40em; margin: 0 0 44px; }
+
+  /* steps */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 26px; list-style: none; padding: 0; margin: 0; }
+  .steps li { border-top: 2px solid var(--cedar); padding-top: 14px; }
+  .num { display: block; font-size: 44px; font-weight: 700; color: var(--ochre); line-height: 1; margin-bottom: 10px; }
+  .steps h3 { font-size: 21px; margin: 0 0 6px; color: var(--cedar); }
+  .steps p { font-size: 16px; color: var(--muted); margin: 0; }
+
+  /* the error story */
+  .story { display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; align-items: start; }
+  .numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 2px solid var(--cedar); }
+  .numbers div { padding: 18px 20px 6px 0; }
+  .stat { display: block; font-size: 92px; line-height: .95; font-weight: 700; letter-spacing: -2px; white-space: nowrap; }
+  .stat.bad { color: var(--wrong); } .stat.good { color: var(--cedar); }
+  .fig { font-size: 16px; color: var(--muted); }
+  .story p { margin: 0 0 16px; }
+  .proof { margin-top: 26px; padding: 16px 20px; border-left: 3px solid var(--ochre); background: #fff; font-size: 17px; }
+
+  /* gallery */
+  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  figure { margin: 0; }
+  figure img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; border: 1px solid var(--line); background: var(--pale); }
+  figure.map img { object-fit: contain; background: #fff; }
+  figcaption { font-size: 16px; color: var(--muted); margin-top: 10px; line-height: 1.4; }
+  figcaption b { color: var(--cedar); font-weight: 600; }
+
+  /* install */
+  .install { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .install h3 { font-size: 22px; color: var(--cedar); margin: 0 0 10px; }
+  pre { background: var(--cedar); color: #e8f0ec; padding: 18px 20px; font-size: 15px; line-height: 1.6; overflow-x: auto; margin: 0 0 14px; }
+  .install p { font-size: 17px; color: var(--muted); }
+  .first { margin-top: 36px; border-left: 3px solid var(--ochre); padding: 14px 20px; background: var(--pale); font-size: 17px; }
+  .first code { font-size: 15px; }
+
+  /* guide + cite */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+  .cite { font-size: 16px; background: #fff; border: 1px solid var(--line); padding: 16px 18px; }
+
+  .install > div, .cols > div, .story > div, .hero .wrap > * { min-width: 0; }
+  p code, .first code { overflow-wrap: anywhere; }
+
+  footer { background: var(--cedar); color: var(--soft); font-family: 'IBM Plex Sans Condensed', sans-serif; font-size: 16px; padding: 32px 0 30px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  footer a { color: #fff; }
+
+  @media (max-width: 960px) {
+    .hero .wrap, .story, .install, .cols { grid-template-columns: 1fr; gap: 40px; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .gallery { grid-template-columns: 1fr 1fr; }
+    .hero h1 { font-size: 46px; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px; }
+    nav { gap: 16px; font-size: 15px; } nav .hide-sm { display: none; }
+    .hero { padding: 104px 0 56px; } .hero h1 { font-size: 38px; } .hero p { font-size: 18px; }
+    section { padding: 60px 0; }
+    h2 { font-size: 31px; } .lead { font-size: 18px; }
+    .steps, .gallery { grid-template-columns: 1fr; }
+    .stat { font-size: 60px; }
+    pre { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top">qgis-agent</a>
+    <nav aria-label="Sections">
+      <a class="hide-sm" href="#how">How it works</a>
+      <a class="hide-sm" href="#gallery">Gallery</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/abdelaalimouid/qgis-agent">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <img class="bg" src="img/contours.jpg" alt="">
+    <div class="wrap">
+      <div>
+        <h1>An AI agent for QGIS that checks its own maps.</h1>
+        <p>qgis-agent is a free, open-source skill for Claude Code. Ask for a GIS or remote sensing task in plain words: it plans first, works with QGIS's own tools, and verifies every result before handing it over.</p>
+        <div class="btns">
+          <a class="btn primary" href="#install">Install it</a>
+          <a class="btn ghost" href="https://github.com/abdelaalimouid/qgis-agent">View on GitHub</a>
+        </div>
+      </div>
+      <img class="demo" src="img/demo.gif" width="800" height="450" alt="Demo: a plain request for an NDVI map around Azrou, the plan, the downloaded image, the NDVI, the class areas, the checks and the finished map.">
+    </div>
+  </div>
+  <div class="spectrum" aria-hidden="true"><span style="background:#4a7bd1"></span><span style="background:#3aa655"></span><span style="background:#d64545"></span><span style="background:#8d6bc2"></span><span style="background:#b07a3c"></span><span style="background:#7a5230"></span></div>
+
+  <section id="how">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <p class="lead">The same five steps for a single reprojection or a full processing chain. You stay in charge of the question and the judgement; the agent does the hands-on work.</p>
+      <ol class="steps">
+        <li><span class="num">1</span><h3>Plans, then waits</h3><p>Steps, QGIS tools, projection, resolution and files, approved before anything runs.</p></li>
+        <li><span class="num">2</span><h3>Uses QGIS's tools</h3><p>Raster calculator, reclassification, zonal histogram, print layouts: steps you can redo by hand.</p></li>
+        <li><span class="num">3</span><h3>Shows evidence</h3><p>Map previews, key figures and value ranges, not just "done".</p></li>
+        <li><span class="num">4</span><h3>Checks the results</h3><p>Projection, ranges, area totals, the project reopened from scratch, one step recomputed another way.</p></li>
+        <li><span class="num">5</span><h3>Reports, then writes</h3><p>A factual work report first; a report or paper draft on request, built only from real results.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="pale" id="why">
+    <div class="wrap story">
+      <div>
+        <h2>A map can look right and be wrong.</h2>
+        <p>During testing, an agent could not reach the server that stores the satellite images. Instead of saying so, it worked around the problem with its own code and an older copy of the catalogue. That copy's values already included a correction that its description still asked for, so every band came out too low.</p>
+        <p>The finished map looked normal. Only an independent recalculation showed the problem. The skill now detects that trap, switches to a safe fallback, and tells the agent to check values against reference ranges before computing anything.</p>
+        <div class="proof">Every change is tested automatically on Linux and macOS with QGIS 4 and on Windows with the official QGIS 3.44 installer, and real downloads from both image sources are compared every week.</div>
+      </div>
+      <div>
+        <div class="numbers">
+          <div><span class="stat bad">6 %</span><span class="fig">"dense built-up" area the agent reported, Khénifra</span></div>
+          <div><span class="stat good">0.2 %</span><span class="fig">the real value, from an independent recalculation</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="wrap">
+      <h2>Gallery</h2>
+      <p class="lead">Real outputs from projects in Morocco, all from open Sentinel-2 data.</p>
+      <div class="gallery">
+        <figure><img src="img/azrou_natural.jpg" alt="True-colour Sentinel-2 image of Azrou" loading="lazy"><figcaption><b>Azrou, true colour.</b> Sentinel-2A, 3 June 2026, a 10 km square read straight from an open catalogue.</figcaption></figure>
+        <figure><img src="img/azrou_ndvi.jpg" alt="NDVI of the Azrou square, brown to green" loading="lazy"><figcaption><b>NDVI at 10 m.</b> From −0.26 to 0.93; the cedar forest stands out in the south-east.</figcaption></figure>
+        <figure class="map"><img src="img/azrou_map.png" alt="Finished NDVI map of Azrou with legend, scale bar and north arrow" loading="lazy"><figcaption><b>The finished map.</b> Classes with their areas, scale bar, north arrow, date, formula and source.</figcaption></figure>
+        <figure><img src="img/ifrane_natural.jpg" alt="True-colour Sentinel-2 image of the Ifrane area" loading="lazy"><figcaption><b>Ifrane National Park.</b> Four tiles from the same pass, 6 June 2026, with no cloud or snow over the area.</figcaption></figure>
+        <figure><img src="img/ifrane_nbr.jpg" alt="NBR of the Ifrane area, red to green" loading="lazy"><figcaption><b>NBR, cedar forest.</b> Mean 0.294 inside the forest against 0.080 in the ring around it.</figcaption></figure>
+        <figure><img src="img/ifrane_mndwi.jpg" alt="MNDWI of the Ifrane area, open water in blue" loading="lazy"><figcaption><b>MNDWI, open water.</b> Lakes in the southern part of the study area. Only 31&nbsp;% of the mapped lake pixels held water on 6 June 2026.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="pale" id="install">
+    <div class="wrap">
+      <h2>Install</h2>
+      <p class="lead">You need Claude Code on your computer and QGIS 3 or 4. Claude on the web cannot drive a QGIS installed on your machine.</p>
+      <div class="install">
+        <div>
+          <h3>As a plugin</h3>
+<pre>/plugin marketplace add abdelaalimouid/qgis-agent
+/plugin install qgis-agent@qgis-agent</pre>
+          <p>Type both in Claude Code. Updates come with <code>claude plugin update qgis-agent@qgis-agent</code>.</p>
+        </div>
+        <div>
+          <h3>By hand</h3>
+<pre>~/.claude/skills/qgis-agent/SKILL.md</pre>
+          <p>Download <a href="https://github.com/abdelaalimouid/qgis-agent/releases/latest/download/qgis-agent.zip">qgis-agent.zip</a> and unzip it into <code>~/.claude/skills/</code> so the file lands at the path above, then start a new session.</p>
+        </div>
+      </div>
+      <div class="first">First run, in your project folder: <code>Use the qgis-agent skill: check that QGIS is detected, then propose a CLAUDE.md file for this project.</code> After that, just ask; Claude opens the skill by itself and answers in your language.</div>
+    </div>
+  </section>
+
+  <section id="guide">
+    <div class="wrap cols">
+      <div>
+        <h2>The guide</h2>
+        <p><a href="https://github.com/abdelaalimouid/qgis-agent/releases/latest/download/qgis-agent-guide.pdf">Working with an AI agent in QGIS</a> explains the method in ten pages: setting up the project, writing the request, the work cycle, checking without redoing everything, the work report and the write-up. It ends with a real work report from the Ifrane forest.</p>
+        <p><a href="https://github.com/abdelaalimouid/qgis-agent/blob/main/ROADMAP.md">Roadmap</a> and <a href="https://github.com/abdelaalimouid/qgis-agent/blob/main/CONTRIBUTING.md">how to contribute</a>: Windows testers and new skills are especially welcome.</p>
+      </div>
+      <div>
+        <h2>Cite</h2>
+        <p class="cite">Mouid, A. (2026). <i>qgis-agent: a Claude Code skill for working in QGIS</i> [software]. https://github.com/abdelaalimouid/qgis-agent</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Made by <a href="https://github.com/abdelaalimouid">Abdelaali Mouid</a>, INPT Rabat. MIT licence.</span>
+    <span>Contains modified Copernicus Sentinel data 2026. Boundaries © OpenStreetMap contributors.</span>
+  </div>
+</footer>
+
+</body>
+</html>
