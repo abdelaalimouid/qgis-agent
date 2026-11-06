@@ -1,6 +1,6 @@
 # qgis-agent
 
-A Claude Code skill that teaches Claude a reliable way to work in QGIS: scope the request, get a plan approved, run each step as a numbered PyQGIS script, check the results, then hand back a factual work report. It is built for GIS and remote sensing coursework and projects: Sentinel-2 imagery, spectral indices, classification, class areas, maps.
+A Claude Code skill that teaches Claude a reliable way to work in QGIS: scope the request, get a plan approved, run each step as a numbered PyQGIS script, check the results, then hand back a factual work report, and write up the results when you ask. It is built for GIS and remote sensing work, from coursework to research and professional projects: Sentinel-2 imagery, spectral indices, classification, class areas, maps.
 
 ![NDVI map produced by an agent using the skill](docs/example_ndvi_map_azrou.png)
 
@@ -58,7 +58,8 @@ After that, just ask for what you want to do. You don't need to name the skill: 
 - It writes each step as a numbered, rerunnable script using QGIS's own tools (raster calculator, reclassify by table, zonal histogram, print layout), so you can redo every step by hand.
 - It shows evidence: map previews, key figures, value ranges.
 - It checks before handing over: projection, resolution, ranges, area totals, the project reopened from scratch.
-- It hands back a factual work report. The analysis and the write-up are yours.
+- It hands back a factual work report: data, processing, results, checks, limits.
+- On request, it writes the interpretation, a report or a paper draft from those results, with no figure the processing didn't produce and the limits kept visible.
 
 By default it uses open data with no account: Sentinel-2 from the Earth Search catalogue, OpenStreetMap through the Overpass API.
 
@@ -108,7 +109,7 @@ The guide [Working with an AI agent in QGIS](docs/qgis-agent-guide.pdf) (10 page
 
 If this skill helps with a report or a paper, please cite it ("Cite this repository" button on the right):
 
-> Mouid, A. (2026). *qgis-agent: a Claude Code skill for working in QGIS* (version 1.0.1) [software]. https://github.com/abdelaalimouid/qgis-agent
+> Mouid, A. (2026). *qgis-agent: a Claude Code skill for working in QGIS* (version 1.0.2) [software]. https://github.com/abdelaalimouid/qgis-agent
 
 ## Author
 

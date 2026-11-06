@@ -1,6 +1,6 @@
 # Work report: template
 
-A work report is a factual record, like a lab notebook. It says what was done, with what, and what came out. It contains no written interpretation and no conclusion: the student writes the analysis and their own report or paper from it.
+A work report is a factual record, like a lab notebook. It says what was done, with what, and what came out. It contains no interpretation and no conclusion. It is the base for any later write-up, whether the user writes it or asks you to.
 
 Writing rules:
 

@@ -1,11 +1,11 @@
 ---
 name: qgis-agent
-description: A working method for driving QGIS (PyQGIS, processing algorithms, GDAL) on any GIS or remote sensing task, from scoping the request to a factual work report. Use it whenever a request involves QGIS or geographic data, in any language and even if QGIS is not named - .qgz or .qgs projects, rasters or vectors (GeoTIFF, GeoPackage, shapefile, GeoJSON), Sentinel-2 or Landsat imagery, spectral indices (NDVI, NDMI, NBR, MNDWI, NDBI, SAVI), reprojection, clipping, classification, class areas, zonal statistics, maps and print layouts, GIS or remote sensing coursework and research.
+description: A working method for driving QGIS (PyQGIS, processing algorithms, GDAL) on any GIS or remote sensing task, from scoping the request to a factual work report and, on request, a written report or paper draft. Use it whenever a request involves QGIS or geographic data, in any language and even if QGIS is not named - .qgz or .qgs projects, rasters or vectors (GeoTIFF, GeoPackage, shapefile, GeoJSON), Sentinel-2 or Landsat imagery, spectral indices (NDVI, NDMI, NBR, MNDWI, NDBI, SAVI), reprojection, clipping, classification, class areas, zonal statistics, maps and print layouts, GIS or remote sensing coursework, research and professional work.
 ---
 
 # Working in QGIS as an agent
 
-You drive QGIS through its Python engine (PyQGIS and the processing algorithms), not by clicking. The user stays the analyst: they ask the question, set the rules, judge the results and write their own report or paper. Your job is to do the hands-on work quickly, cleanly and verifiably, then hand back facts.
+You drive QGIS through its Python engine (PyQGIS and the processing algorithms), not by clicking. The user stays in charge: they ask the question, set the rules and judge the results. Your job is to do the hands-on work quickly, cleanly and verifiably, hand back the facts, and write up the results when they ask.
 
 The cycle below has been proven on real projects. Scale it to the task: a single reprojection needs no written plan, a full processing chain does. Always answer in the user's language.
 
@@ -104,11 +104,13 @@ End with the list of deviations from the assignment and unchecked assumptions. T
 
 One remark at a time. If the user pastes an error message or a screenshot, reproduce the problem, fix the cause, then rerun the downstream scripts so all files stay consistent with each other.
 
-## 8. Hand over a work report, not the deliverable
+## 8. Hand over a work report, then write more if asked
 
-At the end, produce a factual work report, like a lab notebook, following `references/work_report.md`: purpose, data, processing and parameters, files produced, results in tables, checks, limits and open questions.
+At the end, produce a factual work report, like a lab notebook, following `references/work_report.md`: purpose, data, processing and parameters, files produced, results in tables, checks, limits and open questions. It is the record every later document is built from, so it comes first even when the user wants more.
 
-Do not include written interpretation and do not write the report or paper the student has to hand in: it is up to the student to write it from these results. If they ask, help in other ways: explain a concept, check a figure in their text, review their method. Remind them to declare the help they received and to credit the data (wording in `references/remote_sensing.md`).
+If the user asks for more (an interpretation, a written report, a paper draft, a presentation or a summary for a client), write it. Build it only from the results and checks of the work report: no figure, source or claim that the processing did not produce or that you cannot cite. Keep the limits and deviations visible in the text rather than smoothing them over, and point out what still needs the user's judgement or field knowledge. Match the format they ask for (their assignment's structure, a journal's sections, a report template).
+
+Mention once, without insisting, the data credits (wording in `references/remote_sensing.md`) and that many schools and journals ask authors to declare AI assistance.
 
 ## Skill files
 
