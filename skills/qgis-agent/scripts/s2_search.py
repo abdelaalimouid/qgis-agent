@@ -36,22 +36,35 @@ def search(bbox, start, end, clouds, collection):
     return items
 
 
-def scl_shares(items, bbox):
-    """Shares of clouds, shadows and snow over the bbox, from the SCL layer (about 60 m)."""
-    from osgeo import gdal
+def scl_summary(a):
+    """Shares (%) of an SCL array: coverage, clouds (8, 9, 10), shadows (3), snow (11), saturated (1)."""
     import numpy as np
-    gdal.UseExceptions()
-    gdal.SetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
-    hrefs = ["/vsicurl/" + it["assets"]["scl"]["href"] for it in items]
-    ds = gdal.Warp("", hrefs, format="MEM", dstSRS="EPSG:4326", outputBounds=bbox, xRes=0.0006, yRes=0.0006,
-                   resampleAlg="near", srcNodata=0, dstNodata=0)
-    a = ds.ReadAsArray()
+    a = np.asarray(a)
     v = a[a > 0]
     if v.size == 0:
         return None
     pc = lambda codes: 100.0 * np.isin(v, codes).mean()
     return {"covered %": 100.0 * v.size / a.size, "clouds %": pc([8, 9, 10]), "shadows %": pc([3]),
             "snow %": pc([11]), "saturated %": pc([1])}
+
+
+def scl_shares(items, bbox):
+    """Shares of clouds, shadows and snow over the bbox, from the SCL layer (about 60 m)."""
+    from osgeo import gdal
+    gdal.UseExceptions()
+    gdal.SetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN", "EMPTY_DIR")
+    hrefs = ["/vsicurl/" + it["assets"]["scl"]["href"] for it in items]
+    ds = gdal.Warp("", hrefs, format="MEM", dstSRS="EPSG:4326", outputBounds=bbox, xRes=0.0006, yRes=0.0006,
+                   resampleAlg="near", srcNodata=0, dstNodata=0)
+    return scl_summary(ds.ReadAsArray())
+
+
+def group_passes(items):
+    """Groups tiles by pass (day, satellite), sorted by mean tile cloud cover."""
+    days = defaultdict(list)
+    for it in items:
+        days[(it["properties"]["datetime"][:10], it["properties"].get("platform", "?"))].append(it)
+    return sorted(days.items(), key=lambda kv: sum(i["properties"]["eo:cloud_cover"] for i in kv[1]) / len(kv[1]))
 
 
 if __name__ == "__main__":
@@ -64,11 +77,8 @@ if __name__ == "__main__":
     ap.add_argument("--collection", default=COLLECTIONS[0], choices=COLLECTIONS)
     a = ap.parse_args()
     items = search(a.bbox, a.start, a.end, a.clouds, a.collection)
-    days = defaultdict(list)
-    for it in items:
-        days[(it["properties"]["datetime"][:10], it["properties"].get("platform", "?"))].append(it)
-    ranked = sorted(days.items(), key=lambda kv: sum(i["properties"]["eo:cloud_cover"] for i in kv[1]) / len(kv[1]))
-    print(f"collection {a.collection}: {len(items)} tiles, {len(days)} passes (sorted by mean tile cloud cover)\n")
+    ranked = group_passes(items)
+    print(f"collection {a.collection}: {len(items)} tiles, {len(ranked)} passes (sorted by mean tile cloud cover)\n")
     scl_ok = True
     for k, ((day, sat), its) in enumerate(ranked):
         cc = sum(i["properties"]["eo:cloud_cover"] for i in its) / len(its)

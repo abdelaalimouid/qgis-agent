@@ -34,7 +34,7 @@ project/
 Scripts must run with the Python that ships with QGIS, otherwise `qgis.core` and `processing` cannot be found.
 
 - macOS and Linux: `bash <skill>/scripts/qgis_python.sh --info` prints the QGIS and GDAL versions. `bash <skill>/scripts/qgis_python.sh my_script.py args` runs a script in the right environment, with no window.
-- Windows: look for `python-qgis.bat` or `python-qgis-ltr.bat` in `C:\Program Files\QGIS 3.*\bin\` or `C:\OSGeo4W\bin\`, and run scripts with it. It sets up the environment itself.
+- Windows: look for `python-qgis.bat` or `python-qgis-ltr.bat` in `C:\Program Files\QGIS *\bin\` or `C:\OSGeo4W\bin\`, and run scripts with it (`python-qgis-ltr.bat my_script.py args`). It sets up the environment, but leaves the Processing plugin off the Python path: `scripts/pyqgis_template.py` adds it from `QgsApplication.pkgDataPath()`, so start step scripts from the template.
 - `qgis_process`, installed with QGIS, runs a single algorithm from the command line (`qgis_process run native:reprojectlayer -- INPUT=... TARGET_CRS=EPSG:32630 OUTPUT=...`). Handy for a one-off operation.
 
 Start every new step from `scripts/pyqgis_template.py`: it contains the headless start-up (QgsApplication and Processing) and saves the project with relative paths. On older QGIS versions (3.28 and earlier) some API names differ: see the end of `references/pyqgis.md`.

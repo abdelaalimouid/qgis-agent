@@ -1,0 +1,33 @@
+name: live data
+
+# Downloads real Sentinel-2 data from both Earth Search collections and checks they agree.
+# Runs weekly and on demand, so a catalogue outage never blocks a code change.
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    env:
+      QT_QPA_PLATFORM: offscreen
+      QGIS_AGENT_LIVE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: QGIS from conda-forge
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: qgis
+          create-args: >-
+            qgis
+            pytest
+          init-shell: bash
+          cache-environment: true
+
+      - name: Live tests
+        run: python -m pytest -v -m network -W ignore::DeprecationWarning

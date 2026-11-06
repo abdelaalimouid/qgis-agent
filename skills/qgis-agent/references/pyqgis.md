@@ -22,8 +22,12 @@ Code checked on QGIS 3.44 (macOS). Each recipe matches a menu tool, given in the
 See `scripts/pyqgis_template.py`. The essentials:
 
 ```python
+import os, sys
 from qgis.core import QgsApplication
 app = QgsApplication([], False); app.initQgis()
+plugins = os.path.join(QgsApplication.pkgDataPath(), "python", "plugins")   # Windows' python-qgis-ltr.bat
+if os.path.isdir(plugins) and plugins not in sys.path:                     # leaves Processing off the path
+    sys.path.append(plugins)
 from processing.core.Processing import Processing   # import after initQgis
 Processing.initialize()
 import processing

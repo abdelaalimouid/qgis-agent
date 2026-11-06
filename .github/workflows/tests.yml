@@ -1,0 +1,76 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unix:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Linux, QGIS 4
+            os: ubuntu-latest
+          - label: macOS, QGIS 4
+            os: macos-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: QGIS from conda-forge
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: qgis
+          create-args: qgis pytest
+          init-shell: bash
+          cache-environment: true
+
+      - name: QGIS and GDAL versions
+        run: python -c "from qgis.core import Qgis; from osgeo import gdal; print('QGIS', Qgis.version(), 'GDAL', gdal.__version__)"
+
+      - name: Launcher finds QGIS
+        run: bash skills/qgis-agent/scripts/qgis_python.sh --info
+
+      - name: Tests
+        run: python -m pytest -v -W ignore::DeprecationWarning
+
+  windows:
+    # The way most Windows users install QGIS: the official long-term release, run through python-qgis-ltr.bat
+    name: Windows, QGIS LTR installer
+    runs-on: windows-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install QGIS (long-term release)
+        shell: pwsh
+        run: choco install qgis-ltr -y --no-progress
+
+      - name: Find QGIS's Python launcher
+        shell: pwsh
+        run: |
+          $bat = Get-ChildItem "C:\Program Files\QGIS*\bin\python-qgis*.bat" | Select-Object -First 1
+          if (-not $bat) { throw "python-qgis launcher not found" }
+          Write-Output $bat.FullName
+          "QGIS_PYTHON_BAT=$($bat.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: pytest in QGIS's Python
+        shell: cmd
+        run: call "%QGIS_PYTHON_BAT%" -m pip install --quiet pytest
+
+      - name: QGIS and GDAL versions
+        shell: cmd
+        run: call "%QGIS_PYTHON_BAT%" -c "from qgis.core import Qgis; from osgeo import gdal; print('QGIS', Qgis.version(), 'GDAL', gdal.__version__)"
+
+      - name: Tests
+        shell: cmd
+        run: call "%QGIS_PYTHON_BAT%" -m pytest -v -W ignore::DeprecationWarning

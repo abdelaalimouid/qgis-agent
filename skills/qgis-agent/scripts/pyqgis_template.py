@@ -21,6 +21,10 @@ def P(*parts):
 # ---------------------------------------------------------------- start QGIS with no window
 app = QgsApplication([], False)
 app.initQgis()
+# the Processing plugin lives in QGIS's own folder; some launchers (python-qgis-ltr.bat on Windows) leave it off the path
+_plugins = os.path.join(QgsApplication.pkgDataPath(), "python", "plugins")
+if os.path.isdir(_plugins) and _plugins not in sys.path:
+    sys.path.append(_plugins)
 from processing.core.Processing import Processing  # noqa: E402  (after initQgis)
 Processing.initialize()
 import processing  # noqa: E402,F401
