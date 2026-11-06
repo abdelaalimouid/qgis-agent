@@ -103,7 +103,7 @@ Everything is in [`skills/qgis-agent/`](skills/qgis-agent):
 
 ## Guide
 
-The guide [Working with an AI agent in QGIS](docs/qgis-agent-guide.pdf) (10 pages) explains the method behind the skill: setting up the project, writing the request, the work cycle, checking without redoing everything, and the work report. It ends with a real work report from a Sentinel-2 project on the Ifrane forest.
+The guide [Working with an AI agent in QGIS](docs/qgis-agent-guide.pdf) (10 pages) explains the method behind the skill: setting up the project, writing the request, the work cycle, checking without redoing everything, the work report and the write-up. It ends with a real work report from a Sentinel-2 project on the Ifrane forest.
 
 ## Cite
 
