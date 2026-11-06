@@ -1,14 +1,20 @@
 # qgis-agent
 
+[![tests](https://github.com/abdelaalimouid/qgis-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/abdelaalimouid/qgis-agent/actions/workflows/tests.yml)
+[![release](https://img.shields.io/github/v/release/abdelaalimouid/qgis-agent)](https://github.com/abdelaalimouid/qgis-agent/releases/latest)
+[![licence](https://img.shields.io/github/license/abdelaalimouid/qgis-agent)](LICENSE)
+
+**An AI agent for QGIS that checks its own maps.** Website and gallery: [abdelaalimouid.github.io/qgis-agent](https://abdelaalimouid.github.io/qgis-agent/)
+
 A Claude Code skill that teaches Claude a reliable way to work in QGIS: scope the request, get a plan approved, run each step as a numbered PyQGIS script, check the results, then hand back a factual work report, and write up the results when you ask. It is built for GIS and remote sensing work, from coursework to research and professional projects: Sentinel-2 imagery, spectral indices, classification, class areas, maps.
 
-![NDVI map produced by an agent using the skill](docs/example_ndvi_map_azrou.png)
+![Demo: a plain request for an NDVI map around Azrou, then the plan, the image, the NDVI, the class areas, the checks and the finished map](docs/demo.gif)
 
-*NDVI around Azrou (Morocco), produced end to end by an agent using the skill, from a plain student request.*
+*A plain request, end to end: plan, download, NDVI, classes and areas, checks, finished map. Every frame is real output from a test run.*
 
 ## Install
 
-You need Claude Code on your computer (the Claude desktop app's Code tab, or the terminal) and QGIS 3. Claude on the web cannot drive a QGIS installed on your machine.
+You need Claude Code on your computer (the Claude desktop app's Code tab, or the terminal) and QGIS 3 or 4. Claude on the web cannot drive a QGIS installed on your machine.
 
 ### Option 1: as a plugin
 
@@ -94,12 +100,16 @@ Everything is in [`skills/qgis-agent/`](skills/qgis-agent):
 
 ## Tested
 
-- macOS, QGIS 3.44, GDAL 3.13.
-- A fresh agent, told nothing about the skill, received a student's request: NDVI around Azrou, five classes, class areas, a map and a QGIS project. It opened the skill by itself, proposed a plan, waited for approval, then produced everything in four minutes. An independent recalculation gives an identical NDVI, class areas within 0.02 %, and a project that reopens with no warnings.
+- Automated tests for every change: Linux and macOS with QGIS 4.2 (conda-forge), and Windows with the official QGIS 3.44 installer through `python-qgis-ltr.bat`, the way most Windows users run it. They also pass on macOS with QGIS 3.44. They cover the Sentinel-2 reflectance rules, the data and project checkers, the step template and the PyQGIS recipes, each compared with an independent numpy calculation. A weekly job downloads real data from both image sources and checks they agree.
+- A fresh agent, told nothing about the skill, received a request worded like a student's: NDVI around Azrou, five classes, class areas, a map and a QGIS project. It opened the skill by itself, proposed a plan, waited for approval, then produced everything in four minutes. An independent recalculation gives an identical NDVI, class areas within 0.02 %, and a project that reopens with no warnings.
 - A second fresh agent, given a request written in French (NDBI and MNDWI on Khénifra), opened the skill by itself, answered in French and planned with the imagery rules: bundled download, reflectance, 20 m for the SWIR indices, full coverage of the area.
 - The Sentinel-2 bands downloaded by the skill match those of a reference project (Ifrane forest) pixel for pixel.
 - With the image host blocked, the scripts stop with a clear message, and the mirror collection gives the same reflectance as the default one (difference below 0.0000001). An earlier test agent that worked around a blocked host with its own code subtracted the offset twice; version 1.0.1 makes the scripts and the rules close that gap.
-- Windows has not been tested yet. Feedback is welcome in the [Issues](https://github.com/abdelaalimouid/qgis-agent/issues).
+- The Windows job caught a real problem: QGIS's Windows launcher leaves the Processing plugin off the Python path. The step template now adds it. A first hands-on report from a Windows user is still welcome in the [Issues](https://github.com/abdelaalimouid/qgis-agent/issues).
+
+## Contributing
+
+Help is welcome, especially Windows testers, reports of wrong results, examples from your own area and new skills. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [roadmap](ROADMAP.md): the next steps are skills for change detection, land cover classification and time series, then a benchmark that measures whether AI agents get GIS results right.
 
 ## Guide
 
@@ -109,11 +119,11 @@ The guide [Working with an AI agent in QGIS](docs/qgis-agent-guide.pdf) (10 page
 
 If this skill helps with a report or a paper, please cite it ("Cite this repository" button on the right):
 
-> Mouid, A. (2026). *qgis-agent: a Claude Code skill for working in QGIS* (version 1.0.2) [software]. https://github.com/abdelaalimouid/qgis-agent
+> Mouid, A. (2026). *qgis-agent: a Claude Code skill for working in QGIS* (version 1.1.0) [software]. https://github.com/abdelaalimouid/qgis-agent
 
 ## Author
 
-Abdelaali Mouid, Master 2 Industrie X.0, Institut National des Postes et Télécommunications (INPT), Rabat.
+Abdelaali Mouid, Master 2 Data & AI, Institut National des Postes et Télécommunications (INPT), Rabat.
 
 ## Licence
 
