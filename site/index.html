@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>qgis-agent</title>
-<meta name="description" content="A free, open-source Claude Code skill for QGIS and remote sensing. It plans first, uses QGIS's own tools, and checks every result before handing it over.">
+<meta name="description" content="A free, open-source skill for Claude Code and Codex, for QGIS and remote sensing. It plans first, uses QGIS's own tools, and checks every result before handing it over.">
 <meta property="og:title" content="qgis-agent">
 <meta property="og:description" content="An AI agent for QGIS that checks its own maps. Free and open source.">
 <meta property="og:image" content="https://abdelaalimouid.github.io/qgis-agent/img/social-preview.png">
@@ -138,7 +138,7 @@
     <div class="wrap">
       <div>
         <h1>An AI agent for QGIS that checks its own maps.</h1>
-        <p>qgis-agent is a free, open-source skill for Claude Code. Ask for a GIS or remote sensing task in plain words: it plans first, works with QGIS's own tools, and verifies every result before handing it over.</p>
+        <p>qgis-agent is a free, open-source skill for Claude Code and Codex. Ask for a GIS or remote sensing task in plain words: it plans first, works with QGIS's own tools, and verifies every result before handing it over.</p>
         <div class="btns">
           <a class="btn primary" href="#install">Install it</a>
           <a class="btn ghost" href="https://github.com/abdelaalimouid/qgis-agent">View on GitHub</a>
@@ -198,21 +198,22 @@
   <section class="pale" id="install">
     <div class="wrap">
       <h2>Install</h2>
-      <p class="lead">You need Claude Code on your computer and QGIS 3 or 4. Claude on the web cannot drive a QGIS installed on your machine.</p>
+      <p class="lead">You need Claude Code or Codex on your computer, and QGIS 3 or 4. Web chat versions cannot drive a QGIS installed on your machine.</p>
       <div class="install">
         <div>
-          <h3>As a plugin</h3>
+          <h3>Claude Code, as a plugin</h3>
 <pre>/plugin marketplace add abdelaalimouid/qgis-agent
 /plugin install qgis-agent@qgis-agent</pre>
           <p>Type both in Claude Code. Updates come with <code>claude plugin update qgis-agent@qgis-agent</code>.</p>
         </div>
         <div>
-          <h3>By hand</h3>
-<pre>~/.claude/skills/qgis-agent/SKILL.md</pre>
-          <p>Download <a href="https://github.com/abdelaalimouid/qgis-agent/releases/latest/download/qgis-agent.zip">qgis-agent.zip</a> and unzip it into <code>~/.claude/skills/</code> so the file lands at the path above, then start a new session.</p>
+          <h3>By hand, or with Codex</h3>
+<pre>Claude Code   ~/.claude/skills/
+Codex         ~/.agents/skills/</pre>
+          <p>Download <a href="https://github.com/abdelaalimouid/qgis-agent/releases/latest/download/qgis-agent.zip">qgis-agent.zip</a> and unzip it into your agent's skills folder above, then start a new session. In Codex, call it with <code>$qgis-agent</code> or let it pick the skill up by itself.</p>
         </div>
       </div>
-      <div class="first">First run, in your project folder: <code>Use the qgis-agent skill: check that QGIS is detected, then propose a CLAUDE.md file for this project.</code> After that, just ask; Claude opens the skill by itself and answers in your language.</div>
+      <div class="first">First run, in your project folder: <code>Use the qgis-agent skill: check that QGIS is detected, then propose a project rules file for this project.</code> After that, just ask; the agent opens the skill by itself and answers in your language.</div>
     </div>
   </section>
 
@@ -225,7 +226,7 @@
       </div>
       <div>
         <h2>Cite</h2>
-        <p class="cite">Mouid, A. (2026). <i>qgis-agent: a Claude Code skill for working in QGIS</i> [software]. https://github.com/abdelaalimouid/qgis-agent</p>
+        <p class="cite">Mouid, A. (2026). <i>qgis-agent: an agent skill for working in QGIS</i> [software]. https://github.com/abdelaalimouid/qgis-agent</p>
       </div>
     </div>
   </section>

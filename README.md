@@ -6,7 +6,7 @@
 
 **An AI agent for QGIS that checks its own maps.** Website and gallery: [abdelaalimouid.github.io/qgis-agent](https://abdelaalimouid.github.io/qgis-agent/)
 
-A Claude Code skill that teaches Claude a reliable way to work in QGIS: scope the request, get a plan approved, run each step as a numbered PyQGIS script, check the results, then hand back a factual work report, and write up the results when you ask. It is built for GIS and remote sensing work, from coursework to research and professional projects: Sentinel-2 imagery, spectral indices, classification, class areas, maps.
+An agent skill for **Claude Code** and **Codex** that teaches the agent a reliable way to work in QGIS: scope the request, get a plan approved, run each step as a numbered PyQGIS script, check the results, then hand back a factual work report, and write up the results when you ask. It is built for GIS and remote sensing work, from coursework to research and professional projects: Sentinel-2 imagery, spectral indices, classification, class areas, maps.
 
 ![Demo: a plain request for an NDVI map around Azrou, then the plan, the image, the NDVI, the class areas, the checks and the finished map](docs/demo.gif)
 
@@ -14,9 +14,9 @@ A Claude Code skill that teaches Claude a reliable way to work in QGIS: scope th
 
 ## Install
 
-You need Claude Code on your computer (the Claude desktop app's Code tab, or the terminal) and QGIS 3 or 4. Claude on the web cannot drive a QGIS installed on your machine.
+You need an agent that runs on your computer, **Claude Code** (the Claude desktop app's Code tab, or the terminal) or **Codex**, and QGIS 3 or 4. Web chat versions cannot drive a QGIS installed on your machine.
 
-### Option 1: as a plugin
+### Claude Code, option 1: as a plugin
 
 In Claude Code:
 
@@ -39,7 +39,7 @@ claude plugin marketplace update qgis-agent
 claude plugin update qgis-agent@qgis-agent
 ```
 
-### Option 2: by hand
+### Claude Code, option 2: by hand
 
 1. Download [qgis-agent.zip](https://github.com/abdelaalimouid/qgis-agent/releases/latest/download/qgis-agent.zip), the latest version.
 2. Unzip it into `~/.claude/skills/` (on Windows: `C:\Users\<your name>\.claude\skills\`). The file should end up here: `~/.claude/skills/qgis-agent/SKILL.md`.
@@ -49,13 +49,23 @@ You can also ask Claude Code to do it:
 
 > Download https://github.com/abdelaalimouid/qgis-agent/releases/latest/download/qgis-agent.zip and unzip it into ~/.claude/skills/
 
+### Codex
+
+Codex reads the same skill format.
+
+1. Download [qgis-agent.zip](https://github.com/abdelaalimouid/qgis-agent/releases/latest/download/qgis-agent.zip).
+2. Unzip it into `~/.agents/skills/`, Codex's folder for personal skills (for one project only: `.agents/skills/` inside the project). The file should end up here: `~/.agents/skills/qgis-agent/SKILL.md`.
+3. Restart Codex. It opens the skill by itself when a task matches, or call it with `$qgis-agent`.
+
+In Codex the project rules file is `AGENTS.md`, and the skill uses that name. Codex runs commands in a sandbox: when the skill downloads Sentinel-2 data, approve network access (hosts listed under [Network access](#network-access)). The skill is tested end to end with Claude Code; reports from Codex users are welcome in the [Issues](https://github.com/abdelaalimouid/qgis-agent/issues).
+
 ## First run
 
-Open Claude Code on your project folder and type:
+Open Claude Code or Codex on your project folder and type:
 
-> Use the qgis-agent skill: check that QGIS is detected, then propose a CLAUDE.md file for this project.
+> Use the qgis-agent skill: check that QGIS is detected, then propose a project rules file for this project.
 
-After that, just ask for what you want to do. You don't need to name the skill: Claude opens it by itself whenever a task involves QGIS or geographic data. It answers in your language.
+After that, just ask for what you want to do. You don't need to name the skill: the agent opens it by itself whenever a task involves QGIS or geographic data. It answers in your language.
 
 ## What the skill does
 
@@ -71,7 +81,7 @@ By default it uses open data with no account: Sentinel-2 from the Earth Search c
 
 ### Network access
 
-The data scripts need these hosts. If you run Claude Code in a sandbox or behind a firewall, allow them:
+The data scripts need these hosts. If your agent runs in a sandbox (Codex, or Claude Code with sandboxing on) or behind a firewall, allow them:
 
 | Host | Used for |
 |---|---|
@@ -119,7 +129,7 @@ The guide [Working with an AI agent in QGIS](docs/qgis-agent-guide.pdf) (10 page
 
 If this skill helps with a report or a paper, please cite it ("Cite this repository" button on the right):
 
-> Mouid, A. (2026). *qgis-agent: a Claude Code skill for working in QGIS* (version 1.1.0) [software]. https://github.com/abdelaalimouid/qgis-agent
+> Mouid, A. (2026). *qgis-agent: an agent skill for working in QGIS* (version 1.1.1) [software]. https://github.com/abdelaalimouid/qgis-agent
 
 ## Author
 

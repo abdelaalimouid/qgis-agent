@@ -16,6 +16,15 @@ def test_skill_front_matter():
     assert 50 < len(m.group(2)) <= 1024
 
 
+def test_skill_name_follows_the_agent_skills_format():
+    """Claude Code and Codex both read skills in the open Agent Skills format: the name must match the folder,
+    use lowercase letters, digits and hyphens, and stay within 64 characters."""
+    folder = ROOT / "skills" / "qgis-agent"
+    name = re.search(r"^name: (.+)$", (folder / "SKILL.md").read_text(encoding="utf-8"), re.M).group(1).strip()
+    assert name == folder.name
+    assert re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", name) and len(name) <= 64
+
+
 def test_versions_agree():
     version = PLUGIN["version"]
     assert re.fullmatch(r"\d+\.\d+\.\d+", version)

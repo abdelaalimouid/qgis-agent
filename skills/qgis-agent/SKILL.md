@@ -11,8 +11,8 @@ The cycle below has been proven on real projects. Scale it to the task: a single
 
 ## 1. Get to know the project
 
-- Read the project's `CLAUDE.md` if there is one, then the assignment or instructions (often in `sources/`). Note the formulas, class intervals, units, required map elements and deliverables. These are constraints, not suggestions.
-- If there is no `CLAUDE.md`, propose one based on `assets/CLAUDE_template.md`, filled in with what you already know (QGIS version, CRS, resolution), and get it approved. It saves repeating the same rules every session.
+- Read the project's rules file if there is one (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex and most other agents), then the assignment or instructions (often in `sources/`). Note the formulas, class intervals, units, required map elements and deliverables. These are constraints, not suggestions.
+- If there is none, propose one based on `assets/project_rules_template.md`, saved under the name your agent reads (`CLAUDE.md` or `AGENTS.md`), filled in with what you already know (QGIS version, CRS, resolution), and get it approved. It saves repeating the same rules every session.
 - If the request is vague (missing area, period or deliverables), offer to complete it with `assets/request_template.md` rather than guessing.
 - Inventory the data with `scripts/check_data.py`: CRS, pixel size, extent, nodata and value range for rasters; CRS, geometry type, feature count and area for vectors.
 - Never modify the original data (`data/raw/` or equivalent). Work on copies: if a step goes wrong, you restart from the source without downloading anything again.
@@ -26,7 +26,7 @@ project/
 ├── data/        prepared data
 ├── scripts/     numbered steps
 ├── outputs/     rasters, maps, tables
-└── CLAUDE.md    project rules
+└── AGENTS.md    project rules (CLAUDE.md for Claude Code)
 ```
 
 ## 2. Find QGIS's Python
@@ -35,6 +35,7 @@ Scripts must run with the Python that ships with QGIS, otherwise `qgis.core` and
 
 - macOS and Linux: `bash <skill>/scripts/qgis_python.sh --info` prints the QGIS and GDAL versions. `bash <skill>/scripts/qgis_python.sh my_script.py args` runs a script in the right environment, with no window.
 - Windows: look for `python-qgis.bat` or `python-qgis-ltr.bat` in `C:\Program Files\QGIS *\bin\` or `C:\OSGeo4W\bin\`, and run scripts with it (`python-qgis-ltr.bat my_script.py args`). It sets up the environment, but leaves the Processing plugin off the Python path: `scripts/pyqgis_template.py` adds it from `QgsApplication.pkgDataPath()`, so start step scripts from the template.
+- If your commands run in a sandbox (Codex, or Claude Code with sandboxing on), the download scripts need network access to the hosts listed in the README: ask the user to approve it rather than working around the block.
 - `qgis_process`, installed with QGIS, runs a single algorithm from the command line (`qgis_process run native:reprojectlayer -- INPUT=... TARGET_CRS=EPSG:32630 OUTPUT=...`). Handy for a one-off operation.
 
 Start every new step from `scripts/pyqgis_template.py`: it contains the headless start-up (QgsApplication and Processing) and saves the project with relative paths. On older QGIS versions (3.28 and earlier) some API names differ: see the end of `references/pyqgis.md`.
@@ -125,5 +126,5 @@ Mention once, without insisting, the data credits (wording in `references/remote
 | `references/pyqgis.md` | Before writing PyQGIS code |
 | `references/remote_sensing.md` | As soon as satellite imagery is involved |
 | `references/work_report.md` | For the final work report |
-| `assets/CLAUDE_template.md` | Project rules to propose |
+| `assets/project_rules_template.md` | Project rules to propose |
 | `assets/request_template.md` | To complete a vague request |

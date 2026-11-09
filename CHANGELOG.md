@@ -4,6 +4,14 @@ All notable changes to this project are listed here. Versions follow [semantic v
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-09
+
+### Added
+- Codex support. The same skill installs into `~/.agents/skills/` (or `.agents/skills/` in a project), and the README, website and guide explain how. The skill reads `AGENTS.md` (Codex) as well as `CLAUDE.md` (Claude Code), and asks the user to approve network access when its commands run in a sandbox.
+
+### Changed
+- The project rules template is now `assets/project_rules_template.md`, for any agent.
+
 ## [1.1.0] - 2026-11-06
 
 ### Added
@@ -37,7 +45,8 @@ All notable changes to this project are listed here. Versions follow [semantic v
 ### Added
 - First public release: the `qgis-agent` skill (method, references, templates), helper scripts for QGIS, Sentinel-2 search and download, data and project checks, the method guide and an example map.
 
-[Unreleased]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.0.0...v1.0.1
