@@ -4,6 +4,19 @@ All notable changes to this project are listed here. Versions follow [semantic v
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-11
+
+Imagery that is already in the folder (sent by someone, downloaded by hand or with another tool) skipped the download scripts and their protections. With the skill installed, an agent could still subtract the Earth Search mirror's offset a second time, and average a cloudy scene that came without a mask band.
+
+### Added
+- `scripts/check_imagery.py` checks a folder of Sentinel-2 level 2A bands before any calculation. It reads the STAC item (`earthsearch:boa_offset_applied` before `raster:bands`) or ESA's `MTD_MSIL2A.xml`, falls back on the file names and the acquisition date, and prints the reflectance formula with its evidence. It tests the formula on the pixels, says when they cannot decide (bright ground), and estimates the cloud share when there is no mask band (Fmask haze test on B02 and B04, a lower bound), optionally inside a study area (`--area`) and as a mask (`--mask-out`).
+- Imagery rules in `SKILL.md` and `references/remote_sensing.md` for imagery already in the folder: metadata first, a stated assumption when there is none (offset −1000 after 25 January 2022), and no average of a scene without a mask band before its cloud share is measured and reported.
+- Tests for these rules, on synthetic rasters and offline.
+
+### Changed
+- The sanity check before computing indices: almost no pixel of a visible band should be negative with the chosen formula. The median check (below 0.03) stays, but over bright ground neither check can see a double offset: the rules now say so, and that only the metadata decides there.
+- The reflectance rule mentions ESA's reprocessed archive (baseline 05.00 and later), which has the offset even before 2022.
+
 ## [1.1.1] - 2026-11-09
 
 ### Added
@@ -45,7 +58,8 @@ All notable changes to this project are listed here. Versions follow [semantic v
 ### Added
 - First public release: the `qgis-agent` skill (method, references, templates), helper scripts for QGIS, Sentinel-2 search and download, data and project checks, the method guide and an example map.
 
-[Unreleased]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/abdelaalimouid/qgis-agent/compare/v1.0.1...v1.0.2

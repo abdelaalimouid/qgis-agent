@@ -14,7 +14,7 @@ The cycle below has been proven on real projects. Scale it to the task: a single
 - Read the project's rules file if there is one (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex and most other agents), then the assignment or instructions (often in `sources/`). Note the formulas, class intervals, units, required map elements and deliverables. These are constraints, not suggestions.
 - If there is none, propose one based on `assets/project_rules_template.md`, saved under the name your agent reads (`CLAUDE.md` or `AGENTS.md`), filled in with what you already know (QGIS version, CRS, resolution), and get it approved. It saves repeating the same rules every session.
 - If the request is vague (missing area, period or deliverables), offer to complete it with `assets/request_template.md` rather than guessing.
-- Inventory the data with `scripts/check_data.py`: CRS, pixel size, extent, nodata and value range for rasters; CRS, geometry type, feature count and area for vectors.
+- Inventory the data with `scripts/check_data.py`: CRS, pixel size, extent, nodata and value range for rasters; CRS, geometry type, feature count and area for vectors. If satellite bands are already in the folder, also run `scripts/check_imagery.py` on them (see the imagery rules below).
 - Never modify the original data (`data/raw/` or equivalent). Work on copies: if a step goes wrong, you restart from the source without downloading anything again.
 
 Suggested layout for an empty folder:
@@ -66,11 +66,16 @@ If the user asks "how do I do it?", offer both routes: you run the chain with th
 Satellite imagery rules, to apply in every plan (details in `references/remote_sensing.md`):
 
 - Find and download Sentinel-2 with `scripts/s2_search.py` and `scripts/s2_download.py`: open catalogue, no account, only the needed extent, clouds and coverage measured over the area itself. Prefer them to sending the user to a download portal. If the user wants to download by hand, name the product (level 2A) and the bands.
-- Use reflectance, not raw values: apply the scale and offset from the band metadata (usually value × 0.0001 − 0.1).
+- Use reflectance, not raw values: apply the scale and offset from the band metadata (usually value × 0.0001 − 0.1), unless the metadata says the offset is already applied (see imagery already in the folder, below).
 - Indices that use B11 or B12 (NDMI, NBR, MNDWI, NDBI) are computed at 20 m: average the 10 m bands down to 20 m. Never resample the 20 m bands up to 10 m, which creates detail that is not in the data. Pixel area at 20 m: 0.04 ha.
 - Take all tiles from the same pass (same date), and pick a date whose tiles cover the whole area.
-- If the image files cannot be reached (network, firewall or sandbox), the scripts say so: rerun both with `--collection sentinel-2-l2a`, a mirror stored on another host. Never read that mirror with your own code: its values already include the −0.1 offset while its metadata still declares it, so subtracting it again makes every band 0.1 too low and skews every index. The scripts handle this.
-- Sanity check before computing indices: over land, median visible reflectance (B02, B03, B04) is rarely below 0.03, and summer bare soil or towns sit around 0.08 to 0.15. Much lower values point to a double offset.
+- If the image files cannot be reached (network, firewall or sandbox), the scripts say so: rerun both with `--collection sentinel-2-l2a`, a mirror stored on another host. Never read that mirror with your own code: its values already include the −0.1 offset (`earthsearch:boa_offset_applied: true`) while its metadata still declares it, so subtracting it again makes every band 0.1 too low and skews every index. The scripts handle this.
+- Imagery already in the folder (sent by the user or a classmate, downloaded by hand, from another tool or catalogue) never went through the download scripts, so their protections do not apply. Before any calculation, run `scripts/check_imagery.py <folder>` (with `--area` and the study area if there is one), and put the formula it prints and its evidence in the plan. The rules it applies, which hold even if you read the files yourself:
+  - STAC item (`item.json`): read `earthsearch:boa_offset_applied` before `raster:bands`. If it is `true`, reflectance = value × 0.0001, whatever offset `raster:bands` declares.
+  - ESA metadata (`MTD_MSIL2A.xml`): reflectance = (value + `BOA_ADD_OFFSET`) / `BOA_QUANTIFICATION_VALUE`; with no `BOA_ADD_OFFSET`, value / 10000.
+  - No metadata: level 2A bands acquired after 25 January 2022 carry the −1000 offset. Assume it, say so in the plan and the report, and check the raw values: if more than 1 % of a visible band is below 1000, those pixels would come out negative, so the offset is already applied or absent; ask where the files come from. For older dates it depends on the processing (the reprocessed archive has the offset): the raw values may rule it out, otherwise ask.
+- Sanity check before computing indices: with the chosen formula, almost no pixel of a visible band (B02, B03, B04) should be negative. Dark targets (vegetation in red and blue, water, shadow) go negative when the offset is subtracted twice. Bright ground hides the error: with no raw value below 1000, both formulas give plausible reflectance, the pixels cannot tell them apart, and only the metadata decides. A plausible result is not a check. A median visible reflectance below 0.03 over land also points to a double offset.
+- A scene without a mask band (SCL or similar) is never averaged as it is. Measure the cloud share over the area (`check_imagery.py` estimates it from B02 and B04, as a lower bound), report it with the result, and mask the clouds before giving a mean or a share: with the SCL band if you can get it, otherwise with the estimate, saying so. Without a blue band, look at a composite of the scene and ask for the mask band.
 
 Read `references/pyqgis.md` before writing PyQGIS code: tested recipes (raster calculator, discrete symbology, reclassification, zonal histogram, print layout, legend, scale bar, interface screenshots) and known pitfalls. Read `references/remote_sensing.md` as soon as satellite imagery is involved: bands, reflectance, clouds, index formulas, open data sources, licences.
 
@@ -93,6 +98,7 @@ Calculations are rarely wrong; assumptions are wrong more often. Before handing 
 - Class areas add up to the area total (pixel count × pixel area).
 - Areas cover the study area, not the image's bounding rectangle.
 - All tiles come from the same date; no mixing of 10 m and 20 m bands without explicit resampling.
+- The reflectance formula comes from the metadata, or is stated as an assumption; the cloud share over the area is measured (from the mask band, or estimated) and reported.
 - Discrete symbology: QGIS expects the upper bound of each class.
 - Statistics and regressions computed in float64 (in float32 a slope can be wrong with no error message).
 - Every surprising result looked at on a natural colour composite (B04, B03, B02).
@@ -121,6 +127,7 @@ Mention once, without insisting, the data credits (wording in `references/remote
 | `scripts/pyqgis_template.py` | Starting point for each step script |
 | `scripts/check_data.py` | Data inventory and output checks |
 | `scripts/check_project.py` | Reopen a .qgz from scratch and list what it contains |
+| `scripts/check_imagery.py` | Imagery already in a folder: reflectance formula and evidence, clouds without a mask band |
 | `scripts/s2_search.py` | Find clear Sentinel-2 dates over an area |
 | `scripts/s2_download.py` | Download bands as reflectance, for the needed extent only |
 | `references/pyqgis.md` | Before writing PyQGIS code |
