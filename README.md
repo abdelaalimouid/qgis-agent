@@ -70,6 +70,7 @@ After that, just ask for what you want to do. You don't need to name the skill: 
 ## What the skill does
 
 - It reads the assignment and the project rules, then inventories the data.
+- For satellite bands that are already in the folder, it reads their metadata, states the reflectance formula and the evidence for it, and measures the clouds when the scene has no mask band.
 - It proposes a plan (steps, equivalent QGIS tools, projection, resolution, files created) and waits for your approval.
 - It writes each step as a numbered, rerunnable script using QGIS's own tools (raster calculator, reclassify by table, zonal histogram, print layout), so you can redo every step by hand.
 - It shows evidence: map previews, key figures, value ranges.
@@ -105,6 +106,7 @@ Everything is in [`skills/qgis-agent/`](skills/qgis-agent):
 | `scripts/s2_download.py` | Downloads bands as reflectance, for the needed extent only |
 | `scripts/check_data.py` | Inventory and checks of rasters and vectors |
 | `scripts/check_project.py` | Reopens a .qgz project from scratch and lists what it really contains |
+| `scripts/check_imagery.py` | Checks Sentinel-2 bands already in a folder: reflectance formula and evidence, clouds without a mask band |
 | `references/` | Tested PyQGIS recipes, bands and indices, work report template |
 | `assets/` | Project rules and request templates |
 
@@ -115,6 +117,7 @@ Everything is in [`skills/qgis-agent/`](skills/qgis-agent):
 - A second fresh agent, given a request written in French (NDBI and MNDWI on Khénifra), opened the skill by itself, answered in French and planned with the imagery rules: bundled download, reflectance, 20 m for the SWIR indices, full coverage of the area.
 - The Sentinel-2 bands downloaded by the skill match those of a reference project (Ifrane forest) pixel for pixel.
 - With the image host blocked, the scripts stop with a clear message, and the mirror collection gives the same reflectance as the default one (difference below 0.0000001). An earlier test agent that worked around a blocked host with its own code subtracted the offset twice; version 1.0.1 makes the scripts and the rules close that gap.
+- `check_imagery.py` was run on real Sentinel-2 folders: a mirror download with its STAC item, ESA products with their metadata, the same bands renamed with no metadata (2019 and 2023), and a cloudy forest scene with and without its SCL band. It prints the right formula for each, rules the offset out from the 2019 pixels, and says when bright ground leaves the pixels unable to confirm a formula. Without the SCL band, it flags the cloudy scene: 20 % cloud found, against 30 % cloud and 7 % shadow in the SCL.
 - The Windows job caught a real problem: QGIS's Windows launcher leaves the Processing plugin off the Python path. The step template now adds it. A first hands-on report from a Windows user is still welcome in the [Issues](https://github.com/abdelaalimouid/qgis-agent/issues).
 
 ## Contributing
@@ -129,7 +132,7 @@ The guide [Working with an AI agent in QGIS](docs/qgis-agent-guide.pdf) (10 page
 
 If this skill helps with a report or a paper, please cite it ("Cite this repository" button on the right):
 
-> Mouid, A. (2026). *qgis-agent: an agent skill for working in QGIS* (version 1.1.1) [software]. https://github.com/abdelaalimouid/qgis-agent
+> Mouid, A. (2026). *qgis-agent: an agent skill for working in QGIS* (version 1.2.0) [software]. https://github.com/abdelaalimouid/qgis-agent
 
 ## Author
 

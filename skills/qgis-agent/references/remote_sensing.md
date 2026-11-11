@@ -14,7 +14,7 @@
 | B12 | shortwave infrared SWIR 2 (2.2 µm) | 20 m | swir22 |
 | SCL | scene classification | 20 m | scl |
 
-Reflectance: the files hold integers. Since processing baseline 04.00 (January 2022), reflectance = value × 0.0001 − 0.1. Read the scale and offset from each band's metadata (`raster:bands` in the catalogue) rather than assuming them, clamp the result to [0, 1], and treat 0 as nodata. `scripts/s2_download.py` does this.
+Reflectance: the files hold integers. Since processing baseline 04.00 (25 January 2022), and in ESA's reprocessed archive (baseline 05.00 and later, back to 2015), reflectance = value × 0.0001 − 0.1; older original products have no offset. Read the scale and offset from each band's metadata (`raster:bands` in the catalogue) rather than assuming them, clamp the result to [0, 1], and treat 0 as nodata. `scripts/s2_download.py` does this.
 
 Resolution: an index that uses B11 or B12 is computed at 20 m. Bring 10 m bands to 20 m by averaging, never the other way round. Pixel area: 10 m = 0.01 ha; 20 m = 0.04 ha; 30 m (Landsat) = 0.09 ha.
 
@@ -29,6 +29,24 @@ Mosaics: take all tiles from one pass (same day, same satellite). Mixing two dat
 
 The same pixel differs by exactly 1,000 between the two collections, and the mirror's metadata still declares an offset of −0.1. Applying it makes every band 0.1 too low: in a test on Khénifra, the NDBI class above 0.2 grew from 0.2 % to 6 % of the area. `scripts/s2_download.py` reads the property and applies the right rule. Item ids also differ (`S2B_T30STB_20260726T110336_L2A` against `S2B_30STB_20260726_0_L2A`), so search and download with the same `--collection`.
 
+### Imagery already in the folder
+
+Bands that someone else downloaded or exported never went through `s2_download.py`, so its protections do not apply: the files carry whatever their source did. Run `scripts/check_imagery.py <folder> [--area zone.geojson]` before any calculation. It reads the evidence in this order and prints the formula, the evidence and what the pixels say:
+
+| Evidence in the folder | Reflectance |
+|---|---|
+| STAC item with `earthsearch:boa_offset_applied: true` (the mirror) | value × 0.0001: the declared −0.1 is already in the values |
+| STAC item without that property | scale and offset from `raster:bands` |
+| `MTD_MSIL2A.xml` with `BOA_ADD_OFFSET` | (value + `BOA_ADD_OFFSET`) / `BOA_QUANTIFICATION_VALUE` |
+| `MTD_MSIL2A.xml` without `BOA_ADD_OFFSET` (baseline before 04.00) | value / 10000 |
+| File names like the mirror's item ids (`S2A_30SUB_20240830_0_L2A_B04.tif`) | value × 0.0001, likely: get the item to confirm |
+| Product name with a baseline (`..._N0510_...`) | −1000 from 04.00 on, none before |
+| No metadata, acquired after 25 January 2022 | value × 0.0001 − 0.1, assumed: say so |
+| No metadata, older or undated | unknown: the raw values may rule the offset out, otherwise ask the source |
+| Floats between 0 and 1 | already reflectance |
+
+What the pixels can and cannot say. A raw value below 1000 is a reflectance below 0.1 without the offset, and a negative one with it. So if more than 1 % of a visible band is below 1000, the offset is not in the files as a raw post-2022 product would have it: either it is already applied, or there never was one. If almost no value is below 1000, the pixels cannot decide. Over a bright plain in late summer, a double offset left the red band at 0.19 on average and not one pixel below zero; even the blue band, the darkest over land, had only 1.7 % negative. There, only the metadata decides, and a plausible result proves nothing. Neither this check nor the median check catches an offset that was ignored: the values are 0.1 too high and still look normal.
+
 ### Clouds and snow: the SCL layer
 
 | Code | Meaning | Code | Meaning |
@@ -41,6 +59,8 @@ The same pixel differs by exactly 1,000 between the two collections, and the mir
 | 5 | not vegetated | 11 | snow or ice |
 
 The announced cloud cover is for the whole tile (110 km across). Measure the share of codes 3, 8, 9, 10 and 11 over the area itself (`s2_search.py --scl`). Also check that the chosen tiles cover the whole area: a date at the edge of a satellite swath can look clear and still miss part of it.
+
+No SCL band in the folder: never average the scene as it is. `check_imagery.py` estimates the cloud share with the haze test of Fmask (Zhu and Woodcock, 2012): blue − 0.5 × red − 0.08 > 0, on surface reflectance. On a cloudy forest scene it found 20 % cloud where the SCL band gave 30 % cloud and 7 % cloud shadow. It catches thick cloud with very few false alarms (98 % of the pixels it flagged were cloud in the SCL), misses thin cloud and every shadow, and also flags snow, salt flats and white roofs. Treat its figure as a lower bound and report it. Mask with the SCL band if you can get it (`s2_download.py --scl`); otherwise with the estimate (`--mask-out`), saying so. On that scene the estimate removed about two thirds of the cloud bias: mean NDVI 0.296 unmasked, 0.334 with the estimate, 0.354 with the SCL band.
 
 ## Common indices
 
